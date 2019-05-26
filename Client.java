@@ -1,5 +1,4 @@
-// Java implementation for multithreaded chat client 
-// Save file as Client.java 
+// Classe do Cliente
 
 import java.io.*; 
 import java.net.*; 
@@ -7,34 +6,34 @@ import java.util.Scanner;
 
 public class Client 
 { 
-	final static int ServerPort = 1234; 
+	final static int porta = 1234; 
 
 	public static void main(String args[]) throws UnknownHostException, IOException 
 	{ 
 		Scanner scn = new Scanner(System.in); 
 		
-		// getting localhost ip 
-		InetAddress ip = InetAddress.getByName("localhost"); 
+		// Configurando endereço do servidor
+		InetAddress endereco = InetAddress.getByName("localhost"); 
 		
-		// establish the connection 
-		Socket s = new Socket(ip, ServerPort); 
+		// Fazendo conexão
+		Socket s = new Socket(endereco, porta); 
 		
-		// obtaining input and out streams 
+		// Obtendo output e input Stream
 		DataInputStream dis = new DataInputStream(s.getInputStream()); 
 		DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
 
-		// sendMessage thread 
-		Thread sendMessage = new Thread(new Runnable() 
+		// Thread de enviar Mensagem
+		Thread enviaMensagem = new Thread(new Runnable() 
 		{ 
 			@Override
 			public void run() { 
 				while (true) { 
 
-					// read the message to deliver. 
+					 // Lê mensagem digitada
 					String msg = scn.nextLine(); 
 					
 					try { 
-						// write on the output stream 
+						// Envia mensagem
 						dos.writeUTF(msg); 
 					} catch (IOException e) { 
 						e.printStackTrace(); 
@@ -43,15 +42,15 @@ public class Client
 			} 
 		}); 
 		
-		// readMessage thread 
-		Thread readMessage = new Thread(new Runnable() 
+		// Thread de ler mensagem
+		Thread leMensagem = new Thread(new Runnable() 
 		{ 
 			@Override
 			public void run() { 
 
 				while (true) { 
 					try { 
-						// read the message sent to this client 
+						// Recebe mensagem
 						String msg = dis.readUTF(); 
 						System.out.println(msg); 
 					} catch (IOException e) { 
@@ -62,8 +61,8 @@ public class Client
 			} 
 		}); 
 
-		sendMessage.start(); 
-		readMessage.start(); 
+		enviaMensagem.start(); 
+		leMensagem.start(); 
 
 	} 
 } 

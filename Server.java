@@ -1,81 +1,77 @@
-// Java implementation of Server side 
-// It contains two classes : Server and ClientHandler 
+// Implementação do Servidor
+// Contem Duas Classes : Server e ClientHandler 
 
 import java.io.*; 
 import java.util.*; 
 import java.net.*; 
 
-// Server class 
+// Classe Server
 public class Server 
 { 
 
-	// Vector to store active clients 
+	// Vetor para armazenar lista de clientes
 	static Vector<ClientHandler> ar = new Vector<>(); 
 	
-	// counter for clients 
+	// Contador para clientes
 	static int i = 0; 
 
 	public static void main(String[] args) throws IOException 
 	{ 
-		// server is listening on port 1234 
+		// Servidor ouvindo na porta 1234
 		ServerSocket ss = new ServerSocket(1234); 
 		
 		Socket s; 
-		
-		// running infinite loop for getting 
-		// client request 
+		System.out.println("Servidor online");
+		// Rodando em loop infinito para receber conexões de clientes
 		while (true) 
 		{ 
-			// Accept the incoming request 
+			// Aceitando requisição
 			s = ss.accept(); 
 
-			System.out.println("New client request received : " + s); 
+			System.out.println("Requisição de novos clientes : " + s); 
 			
-			// obtain input and output streams 
+			// Obtendo input e output Stream desse cliente
 			DataInputStream dis = new DataInputStream(s.getInputStream()); 
 			DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
 			
-			System.out.println("Creating a new handler for this client..."); 
 
-			// Create a new handler object for handling this request. 
-			ClientHandler mtch = new ClientHandler(s,"client " + i, dis, dos); 
+			// Criando um novo handler para este cliente
+			ClientHandler clientConexao = new ClientHandler(s,"cliente " + i, dis, dos); 
 
-			// Create a new Thread with this object. 
-			Thread t = new Thread(mtch); 
+			// Criando uma thread para esse cliente
+			Thread t = new Thread(clientConexao); 
 			
-			System.out.println("Adding this client to active client list"); 
+			System.out.println("Cliente adicionado a lista"); 
 
-			// add this client to active clients list 
-			ar.add(mtch); 
+			// Adicionando cliente na lista de cliente
+			ar.add(clientConexao); 
 
-			// start the thread. 
+			// Iniciando a thread
 			t.start(); 
 
-			// increment i for new client. 
-			// i is used for naming only, and can be replaced 
-			// by any naming scheme 
+			// incrementa i para novo cliente. 
 			i++; 
 
 		} 
 	} 
 } 
 
-// ClientHandler class 
+// Classe ClientHandler 
 class ClientHandler implements Runnable 
 { 
 	Scanner scn = new Scanner(System.in); 
-	private String name; 
+	private String nome; 
 	final DataInputStream dis; 
 	final DataOutputStream dos; 
 	Socket s; 
 	boolean isloggedin; 
 	
-	// constructor 
-	public ClientHandler(Socket s, String name, 
+	// Construtor
+	public ClientHandler(Socket s, String nome, 
 							DataInputStream dis, DataOutputStream dos) { 
 		this.dis = dis; 
 		this.dos = dos; 
-		this.name = name; 
+		this.nome = nome; 
 		this.s = s; 
 		this.isloggedin=true; 
 	} 
@@ -83,48 +79,44 @@ class ClientHandler implements Runnable
 	@Override
 	public void run() { 
 
-		String received; 
+		String recebido; 
 		while (true) 
 		{ 
 			try
 			{ 
-				// receive the string 
-				received = dis.readUTF(); 
+				// Recebendo a string
+				recebido = dis.readUTF(); 
 				
-				System.out.println(received); 
+				System.out.println(recebido); 
 				
-				if(received.equals("logout")){ 
+				if(recebido.equals("logout")){ 
 					this.isloggedin=false; 
 					this.s.close(); 
 					break; 
 				} 
 				
-				// break the string into message and recipient part 
-				StringTokenizer st = new StringTokenizer(received, "#"); 
-				String MsgToSend = st.nextToken(); 
-				String recipient = st.nextToken(); 
+				// Quebrando a string em msg e destinatário
+				StringTokenizer st = new StringTokenizer(recebido, "#"); 
+				String conteudo = st.nextToken(); 
+				String destinatario = st.nextToken(); 
 
-				System.out.println("Destino"+recipient);
+				System.out.println("Destino: "+destinatario);
 
-				if(recipient.equals("all")) {
+				if(destinatario.equals("all")) {
 					for (ClientHandler mc : Server.ar) 
 					{	 	
-						// if the recipient is found, write on its 
-						// output stream 
-						mc.dos.writeUTF(this.name+" : "+MsgToSend); 
+						mc.dos.writeUTF(this.nome+" : "+conteudo); 
 					}
 		
 
 				} else {
-				// search for the recipient in the connected devices list. 
-				// ar is the vector storing client of active users 
+				// procurando receptor na lista
 				for (ClientHandler mc : Server.ar) 
 				{ 
-					// if the recipient is found, write on its 
-					// output stream 
-					if (mc.name.equals(recipient) && mc.isloggedin==true) 
+					//se o receptor for encontrado manda na lista
+					if (mc.nome.equals(destinatario) && mc.isloggedin==true) 
 					{ 
-						mc.dos.writeUTF(this.name+" : "+MsgToSend); 
+						mc.dos.writeUTF(this.nome+" : "+conteudo); 
 						break; 
 					} 
 				} 
@@ -137,7 +129,7 @@ class ClientHandler implements Runnable
 		} 
 		try
 		{ 
-			// closing resources 
+			// Fechando conexões
 			this.dis.close(); 
 			this.dos.close(); 
 			
