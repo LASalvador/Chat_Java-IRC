@@ -1,19 +1,32 @@
-// Classe do Cliente
+package br.com.fatec.cliente;
 
 import java.io.*; 
 import java.net.*; 
+import java.util.Random;
 import java.util.Scanner; 
 
 public class Client 
 { 
-	final static int porta = 1234; 
+	final static int porta = 1234;
+	
 
 	public static void main(String args[]) throws UnknownHostException, IOException 
 	{ 
-		Scanner scn = new Scanner(System.in); 
+		Scanner scn = new Scanner(System.in);
+		Random random = new Random();
+		String ip, nickName;
+		int chave;
+		System.out.println("Insira o IP do sevidor: ");
+		ip = scn.nextLine();
+		System.out.println("Insira um Nick Name: ");
+		nickName = scn.nextLine();
+		System.out.println("Se você quiser mandar mensagem pra todos digite:\n Mensagem #all \n Exemplo: Ola #all\n");
+		System.out.println("Se você quiser mandar mensagem privada digite:\n Mensagem #NickDoDestinatario \n Exemplo: Ola #Lucas\n");
+		
+		chave = random.nextInt(26);
 		
 		// Configurando endereço do servidor
-		InetAddress endereco = InetAddress.getByName("localhost"); 
+		InetAddress endereco = InetAddress.getByName(ip); 
 		
 		// Fazendo conexão
 		Socket s = new Socket(endereco, porta); 
@@ -21,6 +34,8 @@ public class Client
 		// Obtendo output e input Stream
 		DataInputStream dis = new DataInputStream(s.getInputStream()); 
 		DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+		dos.writeUTF(nickName); 
+		dos.writeUTF(String.valueOf(chave));
 
 		// Thread de enviar Mensagem
 		Thread enviaMensagem = new Thread(new Runnable() 
@@ -30,11 +45,12 @@ public class Client
 				while (true) { 
 
 					 // Lê mensagem digitada
-					String msg = scn.nextLine(); 
+					String msg = scn.nextLine();
+					String msgCripta = Criptografa.encriptar(chave, msg);
 					
 					try { 
 						// Envia mensagem
-						dos.writeUTF(msg); 
+						dos.writeUTF(msgCripta); 
 					} catch (IOException e) { 
 						e.printStackTrace(); 
 					} 
@@ -51,8 +67,11 @@ public class Client
 				while (true) { 
 					try { 
 						// Recebe mensagem
-						String msg = dis.readUTF(); 
-						System.out.println(msg); 
+						String chave = dis.readUTF();
+						String msg = dis.readUTF();
+						String msgEncripta = Criptografa.decriptar(Integer.parseInt(chave), msg);
+						System.out.println(msg);
+						
 					} catch (IOException e) { 
 
 						e.printStackTrace(); 
