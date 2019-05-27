@@ -1,5 +1,4 @@
-// Implementação do Servidor
-// Contem Duas Classes : Server e ClientHandler 
+package br.com.fatec.Servidor;
 
 import java.io.*; 
 import java.util.*; 
@@ -33,10 +32,12 @@ public class Server
 			// Obtendo input e output Stream desse cliente
 			DataInputStream dis = new DataInputStream(s.getInputStream()); 
 			DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+			String nickName = dis.readUTF();
+			String chave = dis.readUTF();
 			
 
 			// Criando um novo handler para este cliente
-			ClientHandler clientConexao = new ClientHandler(s,"cliente " + i, dis, dos); 
+			ClientHandler clientConexao = new ClientHandler(s,nickName, dis, dos, chave); 
 
 			// Criando uma thread para esse cliente
 			Thread t = new Thread(clientConexao); 
@@ -65,15 +66,16 @@ class ClientHandler implements Runnable
 	final DataOutputStream dos; 
 	Socket s; 
 	boolean isloggedin; 
+	String chave;
 	
 	// Construtor
-	public ClientHandler(Socket s, String nome, 
-							DataInputStream dis, DataOutputStream dos) { 
+	public ClientHandler(Socket s, String nome,	DataInputStream dis, DataOutputStream dos, String chave) { 
 		this.dis = dis; 
 		this.dos = dos; 
 		this.nome = nome; 
 		this.s = s; 
-		this.isloggedin=true; 
+		this.isloggedin=true;
+		this.chave = chave;
 	} 
 
 	@Override
@@ -104,7 +106,8 @@ class ClientHandler implements Runnable
 
 				if(destinatario.equals("all")) {
 					for (ClientHandler mc : Server.ar) 
-					{	 	
+					{	 
+						mc.dos.writeUTF(this.chave);
 						mc.dos.writeUTF(this.nome+" : "+conteudo); 
 					}
 		
@@ -116,6 +119,7 @@ class ClientHandler implements Runnable
 					//se o receptor for encontrado manda na lista
 					if (mc.nome.equals(destinatario) && mc.isloggedin==true) 
 					{ 
+						mc.dos.writeUTF(this.chave);
 						mc.dos.writeUTF(this.nome+" : "+conteudo); 
 						break; 
 					} 
