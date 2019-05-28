@@ -1,4 +1,3 @@
-package br.com.fatec.Servidor;
 
 import java.io.*; 
 import java.util.*; 
@@ -35,6 +34,8 @@ public class Server
 			String nickName = dis.readUTF();
 			String chave = dis.readUTF();
 			
+			System.out.println("nickName"+nickName);
+			System.out.println("chave"+chave);
 
 			// Criando um novo handler para este cliente
 			ClientHandler clientConexao = new ClientHandler(s,nickName, dis, dos, chave); 
@@ -89,7 +90,7 @@ class ClientHandler implements Runnable
 				// Recebendo a string
 				recebido = dis.readUTF(); 
 				
-				System.out.println(recebido); 
+				// System.out.println(recebido); 
 				
 				if(recebido.equals("logout")){ 
 					this.isloggedin=false; 
@@ -102,7 +103,7 @@ class ClientHandler implements Runnable
 				String conteudo = st.nextToken(); 
 				String destinatario = st.nextToken(); 
 
-				System.out.println("Destino: "+destinatario);
+				System.out.println(this.nome+" : "+conteudo);
 
 				if(destinatario.equals("all")) {
 					for (ClientHandler mc : Server.ar) 
