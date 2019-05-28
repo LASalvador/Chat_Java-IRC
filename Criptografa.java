@@ -3,8 +3,11 @@ public class Criptografa {
    public static String encriptar(int chave, String texto) {
       StringBuffer criptografado= new StringBuffer(); 
   
-        for (int i=0; i<=texto.length(); i++) 
+        for (int i=0; i<texto.length(); i++) 
         { 
+            if(texto.charAt(i) == 32){
+              continue;
+            }
             if (Character.isUpperCase(texto.charAt(i))) 
             { 
                 char ch = (char)(((int)texto.charAt(i) + chave - 65) % 26 + 65); 
@@ -22,9 +25,12 @@ public class Criptografa {
    public static String decriptar(int chave, String textoCifrado) {
       String mensagemDecriptografada = "";
       char ch;
-         for(int i = 0; i <= textoCifrado.length(); ++i){
+         for(int i = 0; i < textoCifrado.length(); ++i){
          ch = textoCifrado.charAt(i);
-         
+         if(ch == ' '){
+          mensagemDecriptografada += " ";
+          continue;
+         }
          if(ch >= 'a' && ch <= 'z'){
                ch = (char)(ch - chave);
                

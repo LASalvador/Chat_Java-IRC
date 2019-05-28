@@ -90,7 +90,7 @@ class ClientHandler implements Runnable
 				// Recebendo a string
 				recebido = dis.readUTF(); 
 				
-				// System.out.println(recebido); 
+				 System.out.println(recebido); 
 				
 				if(recebido.equals("logout")){ 
 					this.isloggedin=false; 

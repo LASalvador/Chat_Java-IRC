@@ -49,7 +49,7 @@ public class Client
 					// Descobrindo posicao do # e tamanho do string
 					int posDest = msg.indexOf("#");
 					int tamanho = msg.length();
-					String conteudoMsg = msg.substring(0,posDest-1);
+					String conteudoMsg = msg.substring(0,posDest);
 					String destinatarioMsg = msg.substring(posDest+1,tamanho);
 
 					// Criptografando e arrumando msg para servidor
@@ -79,7 +79,6 @@ public class Client
 						String chave = dis.readUTF();
 						String msg = dis.readUTF();
 
-						System.out.println(msg);
 						String msgEncripta = Criptografa.decriptar(Integer.parseInt(chave), msg);
 						System.out.println(msgEncripta);
 						
