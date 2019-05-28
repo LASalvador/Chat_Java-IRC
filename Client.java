@@ -1,4 +1,3 @@
-package br.com.fatec.cliente;
 
 import java.io.*; 
 import java.net.*; 
@@ -46,11 +45,21 @@ public class Client
 
 					 // Lê mensagem digitada
 					String msg = scn.nextLine();
-					String msgCripta = Criptografa.encriptar(chave, msg);
+					// Tratando String para criptografar
+					// Descobrindo posicao do # e tamanho do string
+					int posDest = msg.indexOf("#");
+					int tamanho = msg.length();
+					String conteudoMsg = msg.substring(0,posDest-1);
+					String destinatarioMsg = msg.substring(posDest+1,tamanho);
+
+					// Criptografando e arrumando msg para servidor
+					String msgCripta = Criptografa.encriptar(chave, conteudoMsg);
+
+					String msgFinal = msgCripta + "#" + destinatarioMsg;
 					
 					try { 
 						// Envia mensagem
-						dos.writeUTF(msgCripta); 
+						dos.writeUTF(msgFinal); 
 					} catch (IOException e) { 
 						e.printStackTrace(); 
 					} 
@@ -69,8 +78,10 @@ public class Client
 						// Recebe mensagem
 						String chave = dis.readUTF();
 						String msg = dis.readUTF();
-						String msgEncripta = Criptografa.decriptar(Integer.parseInt(chave), msg);
+
 						System.out.println(msg);
+						String msgEncripta = Criptografa.decriptar(Integer.parseInt(chave), msg);
+						System.out.println(msgEncripta);
 						
 					} catch (IOException e) { 
 
